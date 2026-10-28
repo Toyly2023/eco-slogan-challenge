@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Eco-Slogan Challenge: คิดคำคม จุดพลังประหยัด</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Prompt & Sarabun -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Prompt', 'sans-serif'],
+            body: ['Sarabun', 'sans-serif'],
+          },
+          colors: {
+            eco: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: radial-gradient(circle at top left, #f0fdf4 0%, #f8fafc 50%, #ecfdf5 100%);
+      -webkit-tap-highlight-color: transparent;
+    }
+    input, textarea {
+      font-size: 16px !important; /* Prevents auto-zoom on mobile */
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .timer-active-pulse {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-full flex flex-col selection:bg-emerald-500 selection:text-white">
+
+  <!-- Top App Navigation -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-xs">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer select-none" onclick="switchTab('play')">
+        <div class="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-200 shrink-0">
+          <i data-lucide="leaf" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base md:text-lg font-black bg-gradient-to-r from-emerald-800 to-teal-700 bg-clip-text text-transparent">
+              Eco-Slogan Challenge
+            </span>
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+              รอบ <span id="nav-round-num">1</span>
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 font-body">คิดคำคม จุดพลังประหยัด</p>
+        </div>
+      </div>
+
+      <!-- Desktop Tabs -->
+      <nav class="hidden md:flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl text-xs font-semibold">
+        <button onclick="switchTab('play')" id="tab-btn-play" class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 bg-white text-emerald-800 shadow-xs">
+          <i data-lucide="sparkles" class="w-4 h-4"></i> เล่นเกม / ส่งผลงาน
+        </button>
+        <button onclick="switchTab('leaderboard')" id="tab-btn-leaderboard" class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 text-slate-600 hover:text-emerald-700">
+          <i data-lucide="trophy" class="w-4 h-4"></i> บอร์ดอันดับ 3 แบบ
+        </button>
+        <button onclick="switchTab('gallery')" id="tab-btn-gallery" class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 text-slate-600 hover:text-emerald-700">
+          <i data-lucide="heart" class="w-4 h-4 text-rose-500"></i> โหวตขวัญใจ (5 ใจ)
+        </button>
+        <button onclick="switchTab('host')" id="tab-btn-host" class="px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 text-slate-600 hover:text-emerald-700">
+          <i data-lucide="shield-check" class="w-4 h-4 text-amber-600"></i> แผงผู้จัด (PIN)
+        </button>
+      </nav>
+
+      <!-- Sound toggle & Rubrics modal -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="toggleAudio()" class="w-9 h-9 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 flex items-center justify-center text-slate-600 transition active:scale-95" title="เปิด/ปิดเสียง">
+          <i data-lucide="volume-2" id="sound-icon" class="w-4 h-4"></i>
+        </button>
+        <button onclick="openRulesModal()" class="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold transition active:scale-95 flex items-center gap-1">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>เกณฑ์ 100 คะแนน</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-3.5 py-4 md:py-6 mb-20 md:mb-8 space-y-6">
+
+    <!-- ============================================== -->
+    <!-- TAB 1: GAMEPLAY & SLOGAN SUBMISSION            -->
+    <!-- ============================================== -->
+    <section id="view-play" class="space-y-5">
+
+      <!-- Mission Randomizer Card -->
+      <div class="bg-gradient-to-br from-emerald-700 via-teal-700 to-emerald-900 rounded-3xl p-5 md:p-7 text-white shadow-lg relative overflow-hidden">
+        <div class="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/15 pb-4 mb-4">
+          <div>
+            <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/20 text-[11px] font-semibold text-emerald-100 mb-1.5">
+              <i data-lucide="dices" class="w-3.5 h-3.5"></i> การ์ดโจทย์ภารกิจประจำรอบ
+            </div>
+            <h2 id="scenario-title" class="text-lg md:text-2xl font-bold tracking-tight">กำลังสุ่มโจทย์...</h2>
+            <p id="scenario-category" class="text-xs text-emerald-200/90 font-body">หมวดหมู่: -</p>
+          </div>
+          <button onclick="randomizeMission(true)" class="self-start md:self-auto px-4 py-2 bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl text-xs font-bold tracking-wide transition flex items-center gap-1.5 active:scale-95">
+            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> สุ่มโจทย์ใหม่
+          </button>
+        </div>
+
+        <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div class="bg-black/20 backdrop-blur-xs rounded-2xl p-3.5 border border-white/10 flex flex-col justify-between">
+            <div>
+              <span class="text-emerald-300 font-bold block mb-1">🎯 พฤติกรรมเป้าหมายที่อยากชวนให้ทำ:</span>
+              <p id="scenario-behavior" class="text-white/90 font-body leading-relaxed">-</p>
+            </div>
+            <span id="scenario-device-hint" class="text-[10px] text-emerald-200 mt-2 block font-mono">อุปกรณ์หลัก: -</span>
+          </div>
+
+          <div class="bg-black/20 backdrop-blur-xs rounded-2xl p-3.5 border border-white/10 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-amber-300 font-bold">🔑 คีย์เวิร์ดบังคับ (ต้องมีทั้ง 2 คำ):</span>
+                <span id="kw-counter-pill" class="px-2 py-0.5 rounded-full bg-white/20 font-bold text-[10px]">พบ 0/2 คำ</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 mt-2" id="kw-badges-wrap">
+                <!-- Badges populated dynamically -->
+              </div>
+            </div>
+            <p class="text-[10px] text-amber-200/80 mt-2 italic font-body">
+              💡 กติกาเข้มงวด: หากขาดคำใดคำหนึ่ง ระบบจะไม่เปิดให้ส่งประเมิน
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slogan Form & Compact Inline Timer directly above Textarea -->
+      <div class="bg-white rounded-3xl p-4 sm:p-7 shadow-xs border border-slate-200">
+        <div class="border-b border-slate-100 pb-3 mb-4 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+              <i data-lucide="pen-tool" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-800">ส่งคำขวัญประหยัดพลังงาน</h3>
+              <p class="text-[11px] text-slate-500 font-body">พิมพ์คำคมกระชับ 2 วรรค พร้อมระบุจุดนำไปติดใช้งานจริง</p>
+            </div>
+          </div>
+          <span id="auto-timer-badge" class="hidden text-[10px] px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold animate-pulse">
+            ⚡ กำลังจับเวลา 5 นาที
+          </span>
+        </div>
+
+        <form id="slogan-form" onsubmit="handleSloganSubmit(event)" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label for="team-name-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                ชื่อทีม / ผู้ส่งผลงาน <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="team-name-input" required placeholder="เช่น Green Office ห้อง 4/1"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50 text-sm">
+            </div>
+
+            <div>
+              <label for="action-point-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                จุดนำไปติดป้ายจริง <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="action-point-input" required placeholder="เช่น ข้างสวิตช์ไฟหน้าห้อง หรือ บนรีโมตแอร์"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50/50 text-sm">
+            </div>
+          </div>
+
+          <!-- 2. AUTOMATIC 5-MINUTE INLINE TIMER (Directly above the textarea) -->
+          <div class="rounded-2xl bg-slate-900 border border-slate-800 p-3 sm:p-4 text-white shadow-inner flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div id="timer-box-icon" class="w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center font-bold">
+                <i data-lucide="clock" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-bold text-slate-300">ตัวจับเวลา 5 นาที</span>
+                  <span id="timer-dot" class="w-2 h-2 rounded-full bg-slate-600"></span>
+                </div>
+                <p id="timer-hint-text" class="text-[11px] text-slate-400 font-body">
+                  ⚡ จะเริ่มนับถอยหลัง 05:00 อัตโนมัติเมื่อเริ่มพิมพ์คำแรก
+                </p>
+              </div>
+            </div>
+
+            <div class="text-right flex items-center sm:flex-col justify-between sm:justify-center">
+              <div id="timer-countdown" class="font-mono text-2xl sm:text-3xl font-black tracking-widest text-emerald-400">
+                05:00
+              </div>
+              <div class="w-28 sm:w-36 h-1.5 bg-slate-800 rounded-full overflow-hidden mt-1">
+                <div id="timer-bar" class="h-full bg-emerald-400 transition-all duration-300 w-full"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slogan Textarea with 100 character limit -->
+          <div class="pt-1">
+            <div class="flex items-center justify-between mb-1">
+              <label for="slogan-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                คำขวัญรณรงค์ (แนะนำ 2 วรรคกระชับ) <span class="text-rose-500">*</span>
+              </label>
+              <span id="char-limit-text" class="text-xs font-mono text-slate-400">0 / 100 ตัวอักษร</span>
+            </div>
+            <textarea id="slogan-input" rows="3" maxlength="100" required
+              oninput="handleTypingInput()"
+              placeholder="พิมพ์คำขวัญที่นี่ เช่น ปิดไฟเมื่อพักเที่ยง / เซฟพลังงานร่วมใจ สดใสทุกวัน"
+              class="w-full px-3.5 py-3 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 font-medium leading-relaxed"></textarea>
+          </div>
+
+          <!-- Real-time Pre-submission checks -->
+          <div id="pre-check-status-box" class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2 text-slate-600">
+              <i data-lucide="shield-alert" id="status-icon" class="w-4 h-4 text-amber-500 shrink-0"></i>
+              <span id="status-msg">กรุณาใส่คีย์เวิร์ดบังคับให้ครบทั้ง 2 คำในคำขวัญ</span>
+            </div>
+            <span id="ready-status-badge" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-100 text-amber-800 self-start sm:self-auto shrink-0">
+              ยังไม่พร้อมส่ง (ขาดคีย์เวิร์ด)
+            </span>
+          </div>
+
+          <button type="submit" id="btn-submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-2xl shadow-md shadow-emerald-200 active:scale-[0.99] transition flex items-center justify-center gap-2 text-sm md:text-base">
+            <i data-lucide="send" class="w-4 h-4"></i> ส่งคำขวัญ & ให้ AI ประเมินเกณฑ์เข้มงวด 100 คะแนน
+          </button>
+        </form>
+      </div>
+
+      <!-- Result Card Container (Shown upon submission) -->
+      <div id="eval-result-card" class="hidden transition-all duration-500"></div>
+
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: INTERACTIVE 3-WAY LEADERBOARDS          -->
+    <!-- ============================================== -->
+    <section id="view-leaderboard" class="hidden space-y-5">
+      <div class="bg-white rounded-3xl p-4 sm:p-7 shadow-xs border border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+          <div>
+            <h2 class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="trophy" class="w-5 h-5 text-amber-500"></i> บอร์ดอันดับการแข่งขัน 3 แบบ
+            </h2>
+            <p class="text-xs text-slate-500 font-body">สลับดูกระดานคะแนน AI, ผลโหวตขวัญใจมหาชน และคะแนนสะสมทั้งฤดูกาล</p>
+          </div>
+
+          <!-- 3-Way Switcher Buttons -->
+          <div class="inline-flex p-1 bg-slate-100 rounded-2xl text-xs font-bold border border-slate-200">
+            <button onclick="switchLeaderboardMode('score')" id="lb-btn-score" class="px-3 py-1.5 rounded-xl bg-white text-emerald-800 shadow-xs transition">
+              🎯 คะแนน AI
+            </button>
+            <button onclick="switchLeaderboardMode('vote')" id="lb-btn-vote" class="px-3 py-1.5 rounded-xl text-slate-600 hover:text-emerald-700 transition">
+              💖 ผลโหวตขวัญใจ
+            </button>
+            <button onclick="switchLeaderboardMode('season')" id="lb-btn-season" class="px-3 py-1.5 rounded-xl text-slate-600 hover:text-emerald-700 transition">
+              🏆 สะสมประจำฤดูกาล
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. AI Score Table -->
+        <div id="lb-panel-score" class="space-y-4">
+          <div class="text-[11px] text-slate-500 bg-emerald-50/60 p-2.5 rounded-xl border border-emerald-100 font-body">
+            ⚖️ <strong>กติกา Tie-breaker:</strong> เรียงตาม คะแนนรวม &rarr; ตรงประเด็น (30) &rarr; นำไปใช้จริง (20) &rarr; จำนวนหัวใจโหวต
+          </div>
+          <div class="overflow-x-auto custom-scroll">
+            <table class="w-full text-left text-xs md:text-sm min-w-[560px]">
+              <thead>
+                <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 text-[11px]">
+                  <th class="py-2.5 px-3 text-center w-12">ที่</th>
+                  <th class="py-2.5 px-3">ทีม / ผู้ส่ง</th>
+                  <th class="py-2.5 px-3">คำขวัญ</th>
+                  <th class="py-2.5 px-2 text-center">ตรงประเด็น</th>
+                  <th class="py-2.5 px-2 text-center">สร้างสรรค์</th>
+                  <th class="py-2.5 px-2 text-center">สละสลวย</th>
+                  <th class="py-2.5 px-2 text-center">ใช้จริง</th>
+                  <th class="py-2.5 px-3 text-center font-extrabold text-emerald-800">รวม 100</th>
+                  <th class="py-2.5 px-3 text-center">โหวต</th>
+                </tr>
+              </thead>
+              <tbody id="score-table-body" class="divide-y divide-slate-100 font-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. Popular Vote Ranking -->
+        <div id="lb-panel-vote" class="hidden space-y-3">
+          <div class="bg-rose-50 border border-rose-100 p-3 rounded-2xl text-xs text-rose-800 flex items-center justify-between font-body">
+            <span>💖 เรียงตามจำนวนหัวใจที่ได้รับสูงสุด (Tie-breaker: คะแนน AI &rarr; เวลาส่ง)</span>
+            <span class="font-bold">โควตา 5 ใจ / IP</span>
+          </div>
+          <div id="vote-cards-container" class="space-y-2.5">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- 3. Season Ranking -->
+        <div id="lb-panel-season" class="hidden overflow-x-auto custom-scroll">
+          <table class="w-full text-left text-xs md:text-sm min-w-[500px]">
+            <thead>
+              <tr class="text-slate-400 font-bold uppercase border-b border-slate-100 text-[11px]">
+                <th class="py-2.5 px-3 text-center w-12">อันดับ</th>
+                <th class="py-2.5 px-3">ทีม / ผู้เล่น</th>
+                <th class="py-2.5 px-3 text-center">รอบที่ลงแข่ง</th>
+                <th class="py-2.5 px-3 text-center">คะแนนดีที่สุด</th>
+                <th class="py-2.5 px-3 text-center font-extrabold text-amber-600">แต้มสะสม Season</th>
+              </tr>
+            </thead>
+            <tbody id="season-table-body" class="divide-y divide-slate-100 font-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 3: BLIND VOTE GALLERY (5 HEARTS PER IP)    -->
+    <!-- ============================================== -->
+    <section id="view-gallery" class="hidden space-y-5">
+      <div class="bg-white rounded-3xl p-4 sm:p-7 shadow-xs border border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-5">
+          <div>
+            <h2 class="text-lg md:text-xl font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500"></i> แกลเลอรีคำขวัญ & โหวตขวัญใจมหาชน
+            </h2>
+            <p class="text-xs text-slate-500 font-body">กดหัวใจให้ผลงานที่ชอบ สามารถทุ่มคะแนนหรือถอนคืนสิทธิ์ได้</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Hearts Quota pill -->
+            <div class="px-3.5 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+              <i data-lucide="heart" class="w-3.5 h-3.5 fill-rose-500"></i>
+              โควตาของคุณ: เหลือ <span id="gallery-quota-display" class="text-sm font-black">5</span>/5 ใจ
+            </div>
+
+            <!-- Blind mode toggle -->
+            <button onclick="toggleBlindMode()" id="blind-toggle-btn" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-600 flex items-center gap-1.5 transition active:scale-95">
+              <i data-lucide="eye-off" class="w-3.5 h-3.5 text-slate-500"></i>
+              โหมดซ่อนชื่อ: <span id="blind-status-label" class="font-bold text-emerald-700">เปิด</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cards grid -->
+        <div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- TAB 4: MODERATOR CONTROL (PIN 2532 PROTECTED)   -->
+    <!-- ============================================== -->
+    <section id="view-host" class="hidden space-y-5">
+      
+      <!-- Lock Screen -->
+      <div id="mod-lock-screen" class="max-w-sm mx-auto bg-white rounded-3xl p-6 md:p-8 shadow-xs border border-slate-200 text-center space-y-4">
+        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto shadow-xs">
+          <i data-lucide="lock" class="w-7 h-7"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-slate-800">แผงควบคุมผู้จัดกิจกรรม</h3>
+          <p class="text-xs text-slate-500 font-body mt-0.5">กรุณากรอกรหัส PIN (ค่าเริ่มต้น: <code class="font-bold text-emerald-700">2532</code>)</p>
+        </div>
+
+        <div class="flex justify-center gap-3 my-3">
+          <div class="pin-dot w-3.5 h-3.5 rounded-full border-2 border-slate-300"></div>
+          <div class="pin-dot w-3.5 h-3.5 rounded-full border-2 border-slate-300"></div>
+          <div class="pin-dot w-3.5 h-3.5 rounded-full border-2 border-slate-300"></div>
+          <div class="pin-dot w-3.5 h-3.5 rounded-full border-2 border-slate-300"></div>
+        </div>
+
+        <!-- Touch keypad -->
+        <div class="grid grid-cols-3 gap-2 max-w-[240px] mx-auto pt-1">
+          <button type="button" onclick="pressPin('1')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">1</button>
+          <button type="button" onclick="pressPin('2')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">2</button>
+          <button type="button" onclick="pressPin('3')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">3</button>
+          <button type="button" onclick="pressPin('4')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">4</button>
+          <button type="button" onclick="pressPin('5')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">5</button>
+          <button type="button" onclick="pressPin('6')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">6</button>
+          <button type="button" onclick="pressPin('7')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">7</button>
+          <button type="button" onclick="pressPin('8')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">8</button>
+          <button type="button" onclick="pressPin('9')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">9</button>
+          <button type="button" onclick="clearPin()" class="h-11 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-xs active:scale-95 transition">ล้าง</button>
+          <button type="button" onclick="pressPin('0')" class="h-11 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-slate-700 text-base active:scale-95 transition">0</button>
+          <button type="button" onclick="submitPinUnlock()" class="h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs active:scale-95 transition">ยืนยัน</button>
+        </div>
+      </div>
+
+      <!-- Dashboard (When unlocked) -->
+      <div id="mod-dashboard" class="hidden space-y-5">
+        <div class="bg-white rounded-3xl p-5 md:p-6 shadow-xs border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-bold text-emerald-600 uppercase">Moderator Control Panel</span>
+            <h2 class="text-lg md:text-xl font-bold text-slate-800">จัดการรอบการแข่งขัน & ปรับคะแนนกรรมการ</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="handleChangePin()" class="text-xs px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center gap-1 transition">
+              <i data-lucide="key" class="w-3.5 h-3.5"></i> เปลี่ยน PIN
+            </button>
+            <button onclick="lockModPanel()" class="text-xs px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-semibold flex items-center gap-1 transition">
+              <i data-lucide="lock" class="w-3.5 h-3.5"></i> ล็อกแผง
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-500 uppercase">สุ่มโจทย์รอบใหม่</span>
+              <p class="text-xs text-slate-500 font-body mt-1">รีเซ็ตตัวจับเวลา 5 นาที และสุ่มภารกิจใหม่</p>
+            </div>
+            <button onclick="advanceNextRound()" class="w-full mt-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95">
+              <i data-lucide="fast-forward" class="w-3.5 h-3.5"></i> สุ่มโจทย์ขึ้นรอบใหม่
+            </button>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-500 uppercase">ข้อมูลจำลอง (Mock Teams)</span>
+              <p class="text-xs text-slate-500 font-body mt-1">เพิ่ม 4 ทีมทดสอบเพื่อดูการจัดอันดับและการโหวต</p>
+            </div>
+            <button onclick="seedMockData()" class="w-full mt-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95">
+              <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> +4 ทีมจำลอง
+            </button>
+          </div>
+
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold text-slate-500 uppercase">จัดการฐานข้อมูล</span>
+              <p class="text-xs text-slate-500 font-body mt-1">ส่งออก JSON หรือล้างข้อมูลทั้งหมด</p>
+            </div>
+            <div class="flex gap-2 mt-3">
+              <button onclick="exportDataJSON()" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export
+              </button>
+              <button onclick="resetAllData()" class="flex-1 py-2 bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score override audit list -->
+        <div class="bg-white rounded-3xl p-5 md:p-6 shadow-xs border border-slate-200 space-y-3">
+          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="sliders" class="w-4 h-4 text-emerald-600"></i> ตรวจสอบและปรับแก้คะแนนโดยกรรมการ (Judge Score Override)
+          </h3>
+          <div id="host-audit-list" class="space-y-2.5 font-body">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Mobile Bottom Tab Bar -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 px-2 py-1.5 flex justify-around">
+    <button onclick="switchTab('play')" id="m-btn-play" class="flex flex-col items-center gap-0.5 py-1 px-3 text-emerald-800 font-bold">
+      <i data-lucide="sparkles" class="w-5 h-5"></i>
+      <span class="text-[10px]">แต่งคำขวัญ</span>
+    </button>
+    <button onclick="switchTab('leaderboard')" id="m-btn-leaderboard" class="flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400 font-medium">
+      <i data-lucide="trophy" class="w-5 h-5"></i>
+      <span class="text-[10px]">บอร์ดอันดับ</span>
+    </button>
+    <button onclick="switchTab('gallery')" id="m-btn-gallery" class="flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400 font-medium">
+      <i data-lucide="heart" class="w-5 h-5"></i>
+      <span class="text-[10px]">โหวตขวัญใจ</span>
+    </button>
+    <button onclick="switchTab('host')" id="m-btn-host" class="flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400 font-medium">
+      <i data-lucide="shield-check" class="w-5 h-5"></i>
+      <span class="text-[10px]">แผงผู้จัด</span>
+    </button>
+  </nav>
+
+  <!-- Rules & Strict Rubrics Modal -->
+  <div id="rules-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs hidden items-center justify-center p-3.5">
+    <div class="bg-white w-full max-w-xl rounded-3xl p-5 md:p-7 shadow-2xl max-h-[85vh] overflow-y-auto custom-scroll space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="clipboard-check" class="w-5 h-5 text-emerald-600"></i>
+          <h3 class="text-base font-bold text-slate-800">เกณฑ์การตัดสิน 100 คะแนน (Strict Rubric)</h3>
+        </div>
+        <button onclick="closeRulesModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2.5 text-xs font-body text-slate-600 leading-relaxed">
+        <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200">
+          <strong class="text-amber-900 block mb-0.5">🔑 กติกา 2 คีย์เวิร์ดบังคับ:</strong>
+          ต้องปรากฏคำที่สุ่มได้ครบทั้ง 2 คำในคำขวัญ หากขาดคำใดคำหนึ่งระบบจะไม่เปิดให้กดส่ง
+        </div>
+        <div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+          <strong class="text-emerald-950 block mb-0.5">1. ตรงประเด็นพลังงาน (30 คะแนน):</strong>
+          ตรวจ Action Verb เชิงกายภาพ (ปิด, ถอด, สับ, ตรวจ, ปรับ) และระบุบริบทตรงกับอุปกรณ์ในโจทย์ (-6 หากขาด)
+        </div>
+        <div class="p-3 rounded-2xl bg-teal-50/70 border border-teal-200">
+          <strong class="text-teal-950 block mb-0.5">2. ความคิดสร้างสรรค์และการใช้คำ (30 คะแนน):</strong>
+          หักคะแนนคำเกร่อซ้ำซาก (เช่น ช่วยชาติ, ร่วมใจ, รักษ์โลก คำละ -3) และให้คะแนนพิเศษแก่คำคมที่มี Contrast หรือลูกเล่นภาษา
+        </div>
+        <div class="p-3 rounded-2xl bg-blue-50/70 border border-blue-200">
+          <strong class="text-blue-950 block mb-0.5">3. สละสลวย กระชับ จดจำง่าย (20 คะแนน):</strong>
+          บังคับฉันทลักษณ์ 2 วรรคชัดเจน (คั่นด้วยวรรค หรือ /) หัก 5 คะแนนหากเขียนติดกันเป็นวรรคเดียว
+        </div>
+        <div class="p-3 rounded-2xl bg-orange-50/70 border border-orange-200">
+          <strong class="text-orange-950 block mb-0.5">4. นำไปใช้รณรงค์ได้จริง (20 คะแนน):</strong>
+          ระบุจุดติดป้ายเฉพาะเจาะจง สื่อสารเข้าใจภายใน 3 วินาที
+        </div>
+      </div>
+
+      <button onclick="closeRulesModal()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition">
+        รับทราบกติกา
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast-notify" class="fixed bottom-16 md:bottom-6 right-4 left-4 sm:left-auto sm:right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div class="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-slate-900 text-white text-xs font-semibold shadow-2xl max-w-sm mx-auto">
+      <i data-lucide="info" id="toast-icon" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+      <span id="toast-text" class="truncate">แจ้งเตือน</span>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT ENGINE -->
+  <script>
+    /* ----------------------------------------------------------------
+       1. DATA POOL (Scenarios & Keywords)
+       ---------------------------------------------------------------- */
+    const SITUATIONS = [
+      {
+        id: 'sit_1',
+        title: 'ห้องเรียนเปิดไฟทิ้งไว้ช่วงพักเที่ยง',
+        category: 'โรงเรียน / สถานศึกษา',
+        behavior: 'ชวนเดินปิดสวิตช์ไฟทุกครั้งเมื่อไม่มีผู้ใช้งานในห้อง หรือเปิดรับแสงธรรมชาติ',
+        device: 'ไฟ / สวิตช์',
+        actionDefault: 'ติดข้างสวิตช์ไฟประตูหน้าห้องเรียน'
+      },
+      {
+        id: 'sit_2',
+        title: 'ห้องประชุมเปิดแอร์เย็นจัด ทั้งที่ไม่มีคนอยู่',
+        category: 'สำนักงาน / องค์กร',
+        behavior: 'ชวนตั้งอุณหภูมิ 25-26°C และกดปิดเครื่องปรับอากาศก่อนเลิกประชุม 15 นาที',
+        device: 'แอร์ / รีโมต',
+        actionDefault: 'ติดข้างรีโมตเครื่องปรับอากาศในห้องประชุม'
+      },
+      {
+        id: 'sit_3',
+        title: 'คอมพิวเตอร์และจอเปิด Standby ทิ้งไว้ข้ามคืน',
+        category: 'สำนักงาน / ออฟฟิศ',
+        behavior: 'ชวน Shut down และปิดสวิตช์รางปลั๊กพ่วงเมื่อเลิกงาน ตัดกระแสไฟสแตนด์บาย',
+        device: 'คอมพิวเตอร์ / ปลั๊ก',
+        actionDefault: 'ติดที่จอมอนิเตอร์และรางปลั๊กใต้โต๊ะทำงาน'
+      },
+      {
+        id: 'sit_4',
+        title: 'โรงงานมีจุดท่อลมอัดรั่วซึม สูญเสียแรงดัน',
+        category: 'โรงงานอุตสาหกรรม',
+        behavior: 'ชวนสังเกตเสียงลมรั่วและรีบแจ้งฝ่ายซ่อมบำรุงทันทีเพื่อลดโหลดปั๊มลมอัด',
+        device: 'ท่อลม / วาล์ว',
+        actionDefault: 'ติดบริเวณวาล์วปั๊มลมอัดและบอร์ด 5 ส.'
+      },
+      {
+        id: 'sit_5',
+        title: 'เดินทางไปเส้นทางเดียวกัน แต่ขับรถคนละคัน',
+        category: 'การเดินทาง / โลจิสติกส์',
+        behavior: 'ชวน Carpool (ทางเดียวกันไปด้วยกัน) หรือใช้ขนส่งสาธารณะเพื่อประหยัดน้ำมัน',
+        device: 'รถ / น้ำมัน',
+        actionDefault: 'ติดที่บอร์ดประชาสัมพันธ์ลานจอดรถ'
+      },
+      {
+        id: 'sit_6',
+        title: 'เปิดก๊อกน้ำทิ้งไว้ขณะถูสบู่หรือแปรงฟัน',
+        category: 'สุขภัณฑ์ / การใช้น้ำ',
+        behavior: 'ชวนหมุนปิดก๊อกขณะฟอกสบู่ ลดพลังงานสูบจ่ายน้ำประปาและการสูญเปล่า',
+        device: 'น้ำ / ก๊อก',
+        actionDefault: 'ติดเหนืออ่างล้างมือในห้องน้ำ'
+      }
+    ];
+
+    const KEYWORDS_POOL = [
+      'ปิด', 'พลังงาน', 'ลด', 'ประหยัด', 'รักษ์โลก', 'ตรวจสอบ', 
+      'ถอดปลั๊ก', 'สวิตช์', 'ดับไฟ', 'แอร์', 'ปรับ'
+    ];
+
+    /* ----------------------------------------------------------------
+       2. APP STATE
+       ---------------------------------------------------------------- */
+    let state = {
+      round: 1,
+      currentSituation: null,
+      mandatoryKeywords: [],
+      submissions: [],
+      seasonScores: {},
+      moderatorPin: '2532',
+      isModUnlocked: false,
+      blindMode: true,
+      pinBuffer: ''
+    };
+
+    // Timer state (5 mins = 300s)
+    const TIMER_DURATION = 300;
+    let timerRemaining = TIMER_DURATION;
+    let timerInterval = null;
+    let isTimerRunning = false;
+    let hasStartedTyping = false;
+
+    // Heart Votes (5 Hearts per IP/client)
+    const MAX_HEARTS_PER_IP = 5;
+    let userVotesMap = {}; // { subId: count }
+
+    /* ----------------------------------------------------------------
+       3. SYNTHESIZED WEB AUDIO API
+       ---------------------------------------------------------------- */
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function playSynth(freq = 600, duration = 0.1, type = 'sine') {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('sound-icon');
+      if (soundEnabled) {
+        icon.setAttribute('data-lucide', 'volume-2');
+        showToast('เปิดเสียงสังเคราะห์แล้ว');
+        playSynth(880, 0.15, 'triangle');
+      } else {
+        icon.setAttribute('data-lucide', 'volume-x');
+        showToast('ปิดเสียงแล้ว');
+      }
+      lucide.createIcons();
+    }
+
+    /* ----------------------------------------------------------------
+       4. INITIALIZATION & RANDOMIZER
+       ---------------------------------------------------------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      randomizeMission(false);
+      seedMockData();
+      updateTimerDisplay();
+      renderLeaderboards();
+      renderGallery();
+      lucide.createIcons();
+    });
+
+    function randomizeMission(playSound = true) {
+      if (playSound) playSynth(600, 0.1);
+      
+      const sit = SITUATIONS[Math.floor(Math.random() * SITUATIONS.length)];
+      
+      // Pick 2 distinct keywords
+      const shuffled = [...KEYWORDS_POOL].sort(() => 0.5 - Math.random());
+      const kw1 = shuffled[0];
+      const kw2 = shuffled[1];
+
+      state.currentSituation = sit;
+      state.mandatoryKeywords = [kw1, kw2];
+
+      document.getElementById('scenario-title').textContent = sit.title;
+      document.getElementById('scenario-category').textContent = `หมวดหมู่: ${sit.category}`;
+      document.getElementById('scenario-behavior').textContent = sit.behavior;
+      document.getElementById('scenario-device-hint').textContent = `อุปกรณ์เป้าหมาย: ${sit.device}`;
+      document.getElementById('action-point-input').placeholder = `เช่น ${sit.actionDefault}`;
+
+      validateSloganRealtime();
+      showToast('🎲 สุ่มโจทย์และ 2 คีย์เวิร์ดใหม่แล้ว!');
+    }
+
+    /* ----------------------------------------------------------------
+       5. 5-MINUTE AUTOMATIC COUNTDOWN TIMER
+       ---------------------------------------------------------------- */
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function updateTimerDisplay() {
+      const display = document.getElementById('timer-countdown');
+      const bar = document.getElementById('timer-bar');
+      const dot = document.getElementById('timer-dot');
+      const iconWrap = document.getElementById('timer-box-icon');
+
+      display.textContent = formatTime(timerRemaining);
+      const pct = (timerRemaining / TIMER_DURATION) * 100;
+      bar.style.width = `${pct}%`;
+
+      if (timerRemaining <= 60 && timerRemaining > 0) {
+        display.className = 'font-mono text-2xl sm:text-3xl font-black tracking-widest text-rose-400 animate-pulse';
+        bar.className = 'h-full bg-rose-500 transition-all duration-300';
+        dot.className = 'w-2 h-2 rounded-full bg-rose-500 animate-ping';
+        iconWrap.className = 'w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold';
+      } else if (isTimerRunning) {
+        display.className = 'font-mono text-2xl sm:text-3xl font-black tracking-widest text-emerald-400';
+        bar.className = 'h-full bg-emerald-400 transition-all duration-300';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        iconWrap.className = 'w-10 h-10 rounded-xl bg-slate-800 text-emerald-400 flex items-center justify-center font-bold';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-slate-600';
+      }
+    }
+
+    function startTimerAuto() {
+      if (isTimerRunning) return;
+      isTimerRunning = true;
+      playSynth(880, 0.15, 'triangle');
+      document.getElementById('auto-timer-badge').classList.remove('hidden');
+      document.getElementById('timer-hint-text').textContent = 'กำลังนับถอยหลัง 5 นาที...';
+      document.getElementById('timer-hint-text').classList.add('text-emerald-300');
+
+      timerInterval = setInterval(() => {
+        if (timerRemaining > 0) {
+          timerRemaining--;
+          updateTimerDisplay();
+          if (timerRemaining === 60 || timerRemaining === 30 || timerRemaining === 10) {
+            playSynth(520, 0.15);
+          }
+        } else {
+          clearInterval(timerInterval);
+          isTimerRunning = false;
+          playSynth(330, 0.6, 'sawtooth');
+          showToast('⏰ หมดเวลา 5 นาทีแล้ว กรุณาส่งผลงาน!');
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      hasStartedTyping = false;
+      timerRemaining = TIMER_DURATION;
+      document.getElementById('auto-timer-badge').classList.add('hidden');
+      document.getElementById('timer-hint-text').textContent = '⚡ จะเริ่มนับถอยหลัง 05:00 อัตโนมัติเมื่อเริ่มพิมพ์คำแรก';
+      document.getElementById('timer-hint-text').classList.remove('text-emerald-300');
+      updateTimerDisplay();
+    }
+
+    /* ----------------------------------------------------------------
+       6. REAL-TIME INPUT & DUAL-KEYWORD VALIDATION
+       ---------------------------------------------------------------- */
+    function handleTypingInput() {
+      const text = document.getElementById('slogan-input').value;
+      const len = text.length;
+      document.getElementById('char-limit-text').textContent = `${len} / 100 ตัวอักษร`;
+
+      // Auto-start timer on the first character
+      if (len > 0 && !isTimerRunning && !hasStartedTyping && timerRemaining > 0) {
+        hasStartedTyping = true;
+        startTimerAuto();
+      }
+
+      validateSloganRealtime();
+    }
+
+    function validateSloganRealtime() {
+      const text = document.getElementById('slogan-input').value;
+      const kw1 = state.mandatoryKeywords[0] || '';
+      const kw2 = state.mandatoryKeywords[1] || '';
+
+      const has1 = text.includes(kw1);
+      const has2 = text.includes(kw2);
+      const countFound = (has1 ? 1 : 0) + (has2 ? 1 : 0);
+
+      // Update keyword badges
+      const wrap = document.getElementById('kw-badges-wrap');
+      wrap.innerHTML = `
+        <div class="px-2.5 py-1.5 rounded-xl border flex items-center justify-between text-xs font-bold ${has1 ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-white/10 border-white/20 text-slate-300'}">
+          <span>"${kw1}"</span>
+          <span class="text-[10px] font-normal">${has1 ? 'พบแล้ว ✓' : 'ยังไม่พบ'}</span>
+        </div>
+        <div class="px-2.5 py-1.5 rounded-xl border flex items-center justify-between text-xs font-bold ${has2 ? 'bg-emerald-500/20 border-emerald-400 text-emerald-200' : 'bg-white/10 border-white/20 text-slate-300'}">
+          <span>"${kw2}"</span>
+          <span class="text-[10px] font-normal">${has2 ? 'พบแล้ว ✓' : 'ยังไม่พบ'}</span>
+        </div>
+      `;
+
+      document.getElementById('kw-counter-pill').textContent = `พบ ${countFound}/2 คำ`;
+
+      // Pre-submission status box
+      const msg = document.getElementById('status-msg');
+      const badge = document.getElementById('ready-status-badge');
+      const icon = document.getElementById('status-icon');
+
+      if (countFound === 2) {
+        msg.textContent = `พบคีย์เวิร์ดบังคับครบทั้ง "${kw1}" และ "${kw2}" พร้อมส่งประเมิน!`;
+        badge.textContent = 'พร้อมส่ง ✓';
+        badge.className = 'px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-800 shrink-0';
+        icon.className = 'w-4 h-4 text-emerald-600 shrink-0';
+      } else {
+        const missing = [];
+        if (!has1) missing.push(`"${kw1}"`);
+        if (!has2) missing.push(`"${kw2}"`);
+        msg.textContent = `ยังขาดคีย์เวิร์ดบังคับ: ${missing.join(' และ ')}`;
+        badge.textContent = `ยังไม่พร้อม (${countFound}/2 คำ)`;
+        badge.className = 'px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-100 text-amber-800 shrink-0';
+        icon.className = 'w-4 h-4 text-amber-500 shrink-0';
+      }
+    }
+
+    /* ----------------------------------------------------------------
+       7. STRICT AI SCORING ENGINE (100 Points Rubric)
+       ---------------------------------------------------------------- */
+    function evaluateSloganStrict(slogan, situation, kw1, kw2, actionPoint) {
+      let scoreRel = 18;  // ตรงประเด็น (30)
+      let scoreCrea = 16; // สร้างสรรค์ (30)
+      let scoreFlu = 10;  // สละสลวย (20)
+      let scoreAct = 10;  // นำไปใช้จริง (20)
+
+      const auditNotes = [];
+
+      // 1. Relevance: Action Verb & Equipment Context (30)
+      const actionVerbs = ['ปิด', 'ดับ', 'ถอด', 'สับ', 'ลด', 'ตรวจ', 'เช็ก', 'ปรับ', 'ซ่อม', 'กด', 'ดึง'];
+      const hasAction = actionVerbs.some(v => slogan.includes(v));
+      if (hasAction) {
+        scoreRel += 6;
+      } else {
+        scoreRel -= 6;
+        auditNotes.push('ขาด Action Verb กายภาพ (-6)');
+      }
+
+      const devWords = ['ไฟ', 'สวิตช์', 'แอร์', 'อุณหภูมิ', 'คอม', 'ปลั๊ก', 'ลม', 'ท่อ', 'รถ', 'น้ำ', 'ก๊อก'];
+      const hasDev = devWords.some(w => slogan.includes(w) || situation.title.includes(w));
+      if (hasDev) {
+        scoreRel += 6;
+      } else {
+        scoreRel -= 4;
+        auditNotes.push('ขาดบริบทอุปกรณ์ในโจทย์ (-4)');
+      }
+
+      // 2. Creativity: Cliché Deductions & Contrast (30)
+      const cliches = ['ช่วยชาติ', 'ร่วมใจ', 'ยั่งยืน', 'รักษ์โลก', 'สดใส', 'วันพรุ่ง', 'นิสัยดี'];
+      let clicheHits = cliches.filter(c => slogan.includes(c));
+      if (clicheHits.length > 0) {
+        const penalty = Math.min(clicheHits.length * 3, 6);
+        scoreCrea -= penalty;
+        auditNotes.push(`พบคำเกร่อซ้ำซาก (${clicheHits.join(', ')}) (-${penalty})`);
+      }
+
+      if (slogan.includes('ก่อน') || slogan.includes('เซฟ') || slogan.includes('เลิก') || slogan.includes('ตัด')) {
+        scoreCrea += 6;
+      }
+      if (slogan.length >= 25 && slogan.length <= 60) {
+        scoreCrea += 4;
+      }
+
+      // 3. Fluency & 2-Clause Rhythm (20)
+      const clauses = slogan.split(/[\s/]+/).filter(c => c.trim().length > 0);
+      if (clauses.length === 2) {
+        scoreFlu += 6;
+        const diff = Math.abs(clauses[0].length - clauses[1].length);
+        if (diff <= 8) scoreFlu += 2;
+      } else if (clauses.length === 1) {
+        scoreFlu -= 5;
+        auditNotes.push('ไม่ได้แบ่ง 2 วรรคชัดเจน (-5)');
+      } else {
+        scoreFlu -= 3;
+        auditNotes.push('มีมากกว่า 2 วรรค จดจำยาก (-3)');
+      }
+
+      if (slogan.length > 70) {
+        scoreFlu -= 4;
+        auditNotes.push('ยาวเกิน 70 ตัวอักษร (-4)');
+      }
+
+      // 4. Practical Action & Specific Target (20)
+      if (actionPoint.length >= 6) {
+        scoreAct += 5;
+      } else {
+        scoreAct -= 2;
+        auditNotes.push('จุดติดป้ายสั้นเกินไป (-2)');
+      }
+      if (hasAction && clauses.length === 2) {
+        scoreAct += 5;
+      }
+
+      scoreRel = Math.max(5, Math.min(30, scoreRel));
+      scoreCrea = Math.max(5, Math.min(30, scoreCrea));
+      scoreFlu = Math.max(4, Math.min(20, scoreFlu));
+      scoreAct = Math.max(4, Math.min(20, scoreAct));
+      const total = scoreRel + scoreCrea + scoreFlu + scoreAct;
+
+      let feedback = '';
+      if (total >= 90) {
+        feedback = `ระดับมาสเตอร์พีซ! การเชื่อมโยงคีย์เวิร์ด "${kw1}" และ "${kw2}" ทำได้อย่างแนบเนียน ไร้คำเกร่อ และมี Action Verb เชิงพฤติกรรมชัดเจน`;
+      } else if (total >= 80) {
+        feedback = `ผลงานดีเด่น สื่อสารถึงพฤติกรรมได้ดีและอ่านกระชับ หากขัดเกลาจังหวะคำวรรคหลังให้กลมกลืนจะสมบูรณ์แบบ`;
+      } else if (total >= 70) {
+        feedback = `ผ่านเกณฑ์มาตรฐาน แนะนำให้แบ่ง 2 วรรคให้กระชับ และหลีกเลี่ยงคำซ้ำซ้อนเพื่อให้จดจำได้ทันทีใน 3 วินาที`;
+      } else {
+        feedback = `ควรปรับปรุงให้มี Action Verb พฤติกรรมรูปธรรม และแบ่งวรรคตอนให้อ่านคล้องจอง`;
+      }
+
+      return { scoreRel, scoreCrea, scoreFlu, scoreAct, total, feedback, auditNotes };
+    }
+
+    /* ----------------------------------------------------------------
+       8. SUBMISSION LOGIC
+       ---------------------------------------------------------------- */
+    function handleSloganSubmit(e) {
+      e.preventDefault();
+      const team = document.getElementById('team-name-input').value.trim();
+      const slogan = document.getElementById('slogan-input').value.trim();
+      const actionPoint = document.getElementById('action-point-input').value.trim();
+      const kw1 = state.mandatoryKeywords[0];
+      const kw2 = state.mandatoryKeywords[1];
+
+      if (!slogan.includes(kw1) || !slogan.includes(kw2)) {
+        playSynth(300, 0.3, 'sawtooth');
+        showToast(`❌ ต้องมีคีย์เวิร์ดบังคับครบทั้ง "${kw1}" และ "${kw2}"`);
+        document.getElementById('slogan-input').focus();
+        return;
+      }
+
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+
+      const evalRes = evaluateSloganStrict(slogan, state.currentSituation, kw1, kw2, actionPoint);
+
+      const newSub = {
+        id: 'sub_' + Date.now(),
+        round: state.round,
+        team,
+        slogan,
+        actionPoint,
+        eval: evalRes,
+        votes: 0,
+        createdAt: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+        judgeOverride: null
+      };
+
+      state.submissions.push(newSub);
+      updateSeasonScores(team, evalRes.total);
+
+      playSynth(880, 0.25, 'triangle');
+      if (evalRes.total >= 80 && typeof confetti === 'function') {
+        confetti({ particleCount: 75, spread: 65, origin: { y: 0.65 } });
+      }
+
+      renderResultCard(newSub);
+      renderLeaderboards();
+      renderGallery();
+      resetTimer();
+
+      document.getElementById('slogan-input').value = '';
+      document.getElementById('char-limit-text').textContent = '0 / 100 ตัวอักษร';
+      validateSloganRealtime();
+
+      document.getElementById('eval-result-card').scrollIntoView({ behavior: 'smooth' });
+      showToast('🎉 ประเมินคะแนนสำเร็จแล้ว!');
+    }
+
+    function renderResultCard(item) {
+      const card = document.getElementById('eval-result-card');
+      card.classList.remove('hidden');
+
+      const ev = item.eval;
+      const score = item.judgeOverride ? item.judgeOverride.newScore : ev.totalScore;
+
+      card.innerHTML = `
+        <div class="bg-gradient-to-br from-slate-900 to-emerald-950 rounded-3xl p-5 sm:p-7 text-white shadow-xl relative overflow-hidden border border-emerald-500/20">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 mb-4">
+            <div>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
+                ประเมินสำเร็จ (รอบที่ ${item.round})
+              </span>
+              <h3 class="text-xl font-black mt-1 text-white">${escapeHtml(item.team)}</h3>
+              <p class="text-xs text-slate-300 font-body">📍 จุดติดรณรงค์: ${escapeHtml(item.actionPoint)}</p>
+            </div>
+            <div class="flex items-baseline gap-1 bg-white/10 px-4 py-2.5 rounded-2xl border border-white/10 self-start sm:self-auto">
+              <span class="text-4xl font-black font-mono ${score >= 80 ? 'text-emerald-400' : 'text-amber-400'}">${score}</span>
+              <span class="text-xs text-slate-300">/ 100</span>
+            </div>
+          </div>
+
+          <blockquote class="text-lg md:text-xl font-bold italic text-slate-100 my-3 leading-relaxed">
+            “${escapeHtml(item.slogan)}”
+          </blockquote>
+
+          <!-- 4 Category Breakdown -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 my-4">
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+              <div class="flex justify-between text-xs text-slate-300 mb-1">
+                <span>ตรงประเด็น</span>
+                <span class="font-bold text-emerald-400 font-mono">${ev.scoreRel}/30</span>
+              </div>
+              <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-emerald-400 h-full" style="width: ${(ev.scoreRel/30)*100}%"></div>
+              </div>
+            </div>
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+              <div class="flex justify-between text-xs text-slate-300 mb-1">
+                <span>สร้างสรรค์</span>
+                <span class="font-bold text-teal-400 font-mono">${ev.scoreCrea}/30</span>
+              </div>
+              <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-teal-400 h-full" style="width: ${(ev.scoreCrea/30)*100}%"></div>
+              </div>
+            </div>
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+              <div class="flex justify-between text-xs text-slate-300 mb-1">
+                <span>สละสลวย</span>
+                <span class="font-bold text-blue-400 font-mono">${ev.scoreFlu}/20</span>
+              </div>
+              <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-blue-400 h-full" style="width: ${(ev.scoreFlu/20)*100}%"></div>
+              </div>
+            </div>
+            <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+              <div class="flex justify-between text-xs text-slate-300 mb-1">
+                <span>ใช้จริง</span>
+                <span class="font-bold text-amber-400 font-mono">${ev.scoreAct}/20</span>
+              </div>
+              <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-amber-400 h-full" style="width: ${(ev.scoreAct/20)*100}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-white/5 rounded-2xl border border-white/10 text-xs font-body space-y-2">
+            <div class="text-emerald-300 font-bold flex items-center gap-1">
+              <i data-lucide="bot" class="w-4 h-4"></i> ข้อเสนอแนะจากระบบ AI:
+            </div>
+            <p class="text-slate-200 leading-relaxed">${escapeHtml(ev.feedback)}</p>
+            ${ev.auditNotes.length > 0 ? `
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                ${ev.auditNotes.map(n => `<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-mono">⚠️ ${escapeHtml(n)}</span>`).join('')}
+              </div>
+            ` : '<div class="text-[10px] text-emerald-400 font-mono">✓ ผ่านเกณฑ์ครบถ้วน ไม่ถูกหักคะแนนส่วนใด</div>'}
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function updateSeasonScores(team, score) {
+      if (!state.seasonScores[team]) {
+        state.seasonScores[team] = { rounds: 0, best: 0, points: 0 };
+      }
+      state.seasonScores[team].rounds += 1;
+      state.seasonScores[team].best = Math.max(state.seasonScores[team].best, score);
+      state.seasonScores[team].points += (score >= 85 ? 10 : (score >= 75 ? 7 : 4));
+    }
+
+    /* ----------------------------------------------------------------
+       9. 3-WAY LEADERBOARDS (AI Score, Popular Vote, Season)
+       ---------------------------------------------------------------- */
+    function switchLeaderboardMode(mode) {
+      ['score', 'vote', 'season'].forEach(m => {
+        document.getElementById(`lb-panel-${m}`).classList.add('hidden');
+        document.getElementById(`lb-btn-${m}`).className = 'px-3 py-1.5 rounded-xl text-slate-600 hover:text-emerald-700 transition';
+      });
+      document.getElementById(`lb-panel-${mode}`).classList.remove('hidden');
+      document.getElementById(`lb-btn-${mode}`).className = 'px-3 py-1.5 rounded-xl bg-white text-emerald-800 shadow-xs transition font-bold';
+      renderLeaderboards();
+    }
+
+    function renderLeaderboards() {
+      const currentSubs = state.submissions.filter(s => s.round === state.round);
+
+      // 1. AI Score ranking with Tie-breaker
+      const sortedByScore = [...currentSubs].sort((a, b) => {
+        const scA = a.judgeOverride ? a.judgeOverride.newScore : a.eval.total;
+        const scB = b.judgeOverride ? b.judgeOverride.newScore : b.eval.total;
+        if (scB !== scA) return scB - scA;
+        if (b.eval.scoreRel !== a.eval.scoreRel) return b.eval.scoreRel - a.eval.scoreRel;
+        if (b.eval.scoreAct !== a.eval.scoreAct) return b.eval.scoreAct - a.eval.scoreAct;
+        return b.votes - a.votes;
+      });
+
+      const scoreTbody = document.getElementById('score-table-body');
+      if (sortedByScore.length === 0) {
+        scoreTbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400">ยังไม่มีคำขวัญในรอบนี้</td></tr>`;
+      } else {
+        scoreTbody.innerHTML = sortedByScore.map((s, idx) => {
+          const finalScore = s.judgeOverride ? s.judgeOverride.newScore : s.eval.total;
+          const medal = idx === 0 ? '🥇 1' : idx === 1 ? '🥈 2' : idx === 2 ? '🥉 3' : `${idx + 1}`;
+          return `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-2.5 px-3 text-center font-bold text-slate-700">${medal}</td>
+              <td class="py-2.5 px-3 font-bold text-slate-800">
+                ${escapeHtml(s.team)}
+                ${s.judgeOverride ? '<span class="text-[9px] text-amber-600 block font-normal">*กรรมการปรับ</span>' : ''}
+              </td>
+              <td class="py-2.5 px-3 max-w-[170px] truncate text-slate-600" title="${escapeHtml(s.slogan)}">“${escapeHtml(s.slogan)}”</td>
+              <td class="py-2.5 px-2 text-center font-mono">${s.eval.scoreRel}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${s.eval.scoreCrea}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${s.eval.scoreFlu}</td>
+              <td class="py-2.5 px-2 text-center font-mono">${s.eval.scoreAct}</td>
+              <td class="py-2.5 px-3 text-center font-mono font-black text-emerald-700">${finalScore}</td>
+              <td class="py-2.5 px-3 text-center font-bold text-rose-500">❤️ ${s.votes}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // 2. Popular Vote ranking
+      const sortedByVote = [...currentSubs].sort((a, b) => {
+        if (b.votes !== a.votes) return b.votes - a.votes;
+        const scA = a.judgeOverride ? a.judgeOverride.newScore : a.eval.total;
+        const scB = b.judgeOverride ? b.judgeOverride.newScore : b.eval.total;
+        return scB - scA;
+      });
+
+      const maxVotes = Math.max(...currentSubs.map(s => s.votes), 0);
+      const voteCards = document.getElementById('vote-cards-container');
+      if (sortedByVote.length === 0) {
+        voteCards.innerHTML = `<p class="text-center py-6 text-slate-400 text-xs">ยังไม่มีข้อมูลการโหวตในรอบนี้</p>`;
+      } else {
+        voteCards.innerHTML = sortedByVote.map((s, idx) => {
+          const isTop = maxVotes > 0 && s.votes === maxVotes;
+          const medal = idx === 0 ? '💖 อันดับ 1' : idx === 1 ? '🥈 อันดับ 2' : idx === 2 ? '🥉 อันดับ 3' : `#${idx + 1}`;
+          return `
+            <div class="p-3.5 rounded-2xl border border-slate-200 bg-white shadow-2xs flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-bold px-2.5 py-1 rounded-xl ${idx === 0 ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-700'}">${medal}</span>
+                <div>
+                  <div class="font-bold text-slate-800 text-xs md:text-sm flex items-center gap-1.5">
+                    ${escapeHtml(s.team)}
+                    ${isTop ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-500 text-white font-bold">🌟 ขวัญใจมหาชน</span>' : ''}
+                  </div>
+                  <div class="text-xs text-slate-500 italic truncate max-w-xs">“${escapeHtml(s.slogan)}”</div>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-base font-black text-rose-500">❤️ ${s.votes}</span>
+                <span class="text-[10px] text-slate-400 block font-mono">AI: ${s.judgeOverride ? s.judgeOverride.newScore : s.eval.total}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 3. Season ranking
+      const seasonTeams = Object.keys(state.seasonScores).map(name => ({
+        name,
+        ...state.seasonScores[name]
+      })).sort((a, b) => b.points - a.points || b.best - a.best);
+
+      const seasonTbody = document.getElementById('season-table-body');
+      if (seasonTeams.length === 0) {
+        seasonTbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">ยังไม่มีข้อมูลสะสมประจำฤดูกาล</td></tr>`;
+      } else {
+        seasonTbody.innerHTML = seasonTeams.map((t, idx) => `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-2.5 px-3 text-center font-bold text-slate-700">${idx + 1}</td>
+            <td class="py-2.5 px-3 font-bold text-slate-800">${escapeHtml(t.name)}</td>
+            <td class="py-2.5 px-3 text-center text-slate-600">${t.rounds}</td>
+            <td class="py-2.5 px-3 text-center font-mono font-bold text-emerald-700">${t.best}</td>
+            <td class="py-2.5 px-3 text-center font-mono font-black text-amber-600">${t.points} แต้ม</td>
+          </tr>
+        `).join('');
+      }
+      lucide.createIcons();
+    }
+
+    /* ----------------------------------------------------------------
+       10. BLIND VOTE GALLERY (5 Hearts Quota per IP)
+       ---------------------------------------------------------------- */
+    function getTotalHeartsUsed() {
+      return Object.values(userVotesMap).reduce((sum, v) => sum + v, 0);
+    }
+
+    function toggleBlindMode() {
+      state.blindMode = !state.blindMode;
+      document.getElementById('blind-status-label').textContent = state.blindMode ? 'เปิด' : 'ปิด';
+      renderGallery();
+    }
+
+    function renderGallery() {
+      const currentSubs = state.submissions.filter(s => s.round === state.round);
+      const used = getTotalHeartsUsed();
+      const remaining = Math.max(0, MAX_HEARTS_PER_IP - used);
+      document.getElementById('gallery-quota-display').textContent = remaining;
+
+      const grid = document.getElementById('gallery-grid');
+      if (currentSubs.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-xs">ยังไม่มีผลงานในรอบนี้</div>`;
+        return;
+      }
+
+      const maxVotes = Math.max(...currentSubs.map(s => s.votes), 0);
+
+      grid.innerHTML = currentSubs.map(s => {
+        const myVotes = userVotesMap[s.id] || 0;
+        const author = state.blindMode ? '🔒 ผู้เข้าแข่งขันนิรนาม' : escapeHtml(s.team);
+        const isTop = maxVotes > 0 && s.votes === maxVotes;
+        const finalScore = s.judgeOverride ? s.judgeOverride.newScore : s.eval.total;
+
+        return `
+          <div class="bg-slate-50/70 rounded-2xl p-4 border border-slate-200 flex flex-col justify-between hover:border-emerald-300 transition">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+                <span class="font-bold text-slate-700">${author}</span>
+                <span class="font-mono text-[10px]">รอบ ${s.round}</span>
+              </div>
+              <blockquote class="text-sm md:text-base font-bold text-slate-800 mb-2 leading-relaxed">
+                “${escapeHtml(s.slogan)}”
+              </blockquote>
+              <div class="text-[11px] text-slate-500 bg-white p-2 rounded-xl border border-slate-100 font-body mb-2 truncate">
+                📍 จุดติด: ${escapeHtml(s.actionPoint)}
+              </div>
+              ${isTop ? '<span class="inline-block text-[10px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold mb-2">🌟 ขวัญใจมหาชน</span>' : ''}
+            </div>
+
+            <div class="pt-2 border-t border-slate-200 flex items-center justify-between text-xs">
+              <span class="font-mono font-bold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded">
+                AI: ${finalScore}
+              </span>
+              <div class="flex items-center gap-1.5">
+                ${myVotes > 0 ? `
+                  <button onclick="castVote('${s.id}', -1)" title="ถอน 1 หัวใจคืน" class="px-2.5 py-1 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold active:scale-95 transition">
+                    -1
+                  </button>
+                ` : ''}
+                <button onclick="castVote('${s.id}', 1)" ${remaining <= 0 ? 'disabled' : ''} class="px-3.5 py-1 rounded-xl ${remaining > 0 ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 active:scale-95' : 'bg-slate-100 text-slate-400 cursor-not-allowed'} font-bold flex items-center gap-1 transition">
+                  <i data-lucide="heart" class="w-3.5 h-3.5 ${myVotes > 0 ? 'fill-rose-500' : ''}"></i>
+                  <span>${s.votes}</span>
+                  ${myVotes > 0 ? `<span class="text-[10px] font-normal text-rose-500">(${myVotes})</span>` : ''}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function castVote(subId, delta) {
+      const used = getTotalHeartsUsed();
+      if (delta > 0 && used >= MAX_HEARTS_PER_IP) {
+        playSynth(300, 0.2, 'sawtooth');
+        showToast('⚠️ คุณใช้สิทธิ์โควตาครบ 5 หัวใจแล้ว!');
+        return;
+      }
+
+      const current = userVotesMap[subId] || 0;
+      if (delta < 0 && current <= 0) return;
+
+      userVotesMap[subId] = current + delta;
+      if (userVotesMap[subId] <= 0) delete userVotesMap[subId];
+
+      const sub = state.submissions.find(s => s.id === subId);
+      if (sub) {
+        sub.votes = Math.max(0, sub.votes + delta);
+      }
+
+      playSynth(delta > 0 ? 800 : 400, 0.1);
+      renderGallery();
+      renderLeaderboards();
+    }
+
+    /* ----------------------------------------------------------------
+       11. MODERATOR CONTROL (PIN 2532)
+       ---------------------------------------------------------------- */
+    function updatePinDots() {
+      const dots = document.querySelectorAll('.pin-dot');
+      dots.forEach((dot, idx) => {
+        if (idx < state.pinBuffer.length) {
+          dot.className = 'pin-dot w-3.5 h-3.5 rounded-full bg-emerald-600 border-2 border-emerald-600';
+        } else {
+          dot.className = 'pin-dot w-3.5 h-3.5 rounded-full border-2 border-slate-300';
+        }
+      });
+    }
+
+    function pressPin(digit) {
+      if (state.pinBuffer.length < 4) {
+        state.pinBuffer += digit;
+        playSynth(700, 0.05);
+        updatePinDots();
+        if (state.pinBuffer.length === 4) {
+          setTimeout(submitPinUnlock, 150);
+        }
+      }
+    }
+
+    function clearPin() {
+      state.pinBuffer = '';
+      updatePinDots();
+      playSynth(500, 0.05);
+    }
+
+    function submitPinUnlock() {
+      if (state.pinBuffer === state.moderatorPin) {
+        state.isModUnlocked = true;
+        playSynth(880, 0.2, 'triangle');
+        document.getElementById('mod-lock-screen').classList.add('hidden');
+        document.getElementById('mod-dashboard').classList.remove('hidden');
+        renderHostAuditList();
+        showToast('🔓 ปลดล็อกแผงผู้จัดสำเร็จ!');
+      } else {
+        playSynth(250, 0.35, 'sawtooth');
+        showToast('❌ PIN ไม่ถูกต้อง (รหัสตั้งต้น: 2532)');
+        clearPin();
+      }
+    }
+
+    function lockModPanel() {
+      state.isModUnlocked = false;
+      clearPin();
+      document.getElementById('mod-lock-screen').classList.remove('hidden');
+      document.getElementById('mod-dashboard').classList.add('hidden');
+      playSynth(400, 0.1);
+    }
+
+    function handleChangePin() {
+      const cur = prompt('กรุณากรอก PIN เดิม:');
+      if (cur !== state.moderatorPin) {
+        alert('PIN เดิมไม่ถูกต้อง');
+        return;
+      }
+      const next = prompt('กรุณากำหนด PIN 4 หลักใหม่:');
+      if (next && next.length === 4 && /^\d+$/.test(next)) {
+        state.moderatorPin = next;
+        showToast(`บันทึก PIN ใหม่แล้ว: ${next}`);
+      } else {
+        alert('PIN ต้องเป็นตัวเลข 4 หลัก');
+      }
+    }
+
+    function renderHostAuditList() {
+      const container = document.getElementById('host-audit-list');
+      const currentSubs = state.submissions.filter(s => s.round === state.round);
+
+      if (currentSubs.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center">ไม่มีข้อมูลคำขวัญในรอบนี้</p>`;
+        return;
+      }
+
+      container.innerHTML = currentSubs.map(s => {
+        const sc = s.judgeOverride ? s.judgeOverride.newScore : s.eval.total;
+        return `
+          <div class="p-3 rounded-2xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div>
+              <div class="font-bold text-slate-800 text-sm">${escapeHtml(s.team)}</div>
+              <div class="text-slate-600 italic">“${escapeHtml(s.slogan)}”</div>
+              <div class="text-slate-400 mt-0.5">คะแนน AI: <strong>${s.eval.total}</strong> | ปัจจุบัน: <strong>${sc}</strong></div>
+            </div>
+            <button onclick="overrideJudgeScore('${s.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold active:scale-95 transition self-start sm:self-auto">
+              ปรับแก้คะแนน
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function overrideJudgeScore(subId) {
+      const sub = state.submissions.find(s => s.id === subId);
+      if (!sub) return;
+
+      const curScore = sub.judgeOverride ? sub.judgeOverride.newScore : sub.eval.total;
+      const input = prompt(`ปรับคะแนนใหม่สำหรับทีม "${sub.team}" (0-100):`, curScore);
+      if (input === null) return;
+
+      const num = parseInt(input, 10);
+      if (isNaN(num) || num < 0 || num > 100) {
+        alert('กรุณากรอกคะแนน 0 - 100');
+        return;
+      }
+
+      const reason = prompt('ระบุเหตุผลประกอบการปรับคะแนนของกรรมการ:', 'กรรมการพิจารณาความกระชับเป็นเลิศ');
+      sub.judgeOverride = { newScore: num, reason: reason || 'ตามดุลยพินิจ' };
+      showToast(`ปรับคะแนนทีม ${sub.team} เป็น ${num} แล้ว`);
+      renderHostAuditList();
+      renderLeaderboards();
+      renderGallery();
+    }
+
+    function advanceNextRound() {
+      state.round += 1;
+      userVotesMap = {}; // Reset votes quota for new round
+      document.getElementById('nav-round-num').textContent = state.round;
+      randomizeMission(false);
+      resetTimer();
+      renderLeaderboards();
+      renderGallery();
+      renderHostAuditList();
+      showToast(`🚀 เริ่มรอบที่ ${state.round} แล้ว! สุ่มโจทย์ใหม่สำเร็จ`);
+      switchTab('play');
+    }
+
+    function seedMockData() {
+      const mockTeams = [
+        { team: 'ทีมรักษ์พลัง ม.4/1', slogan: 'ปิดไฟเมื่อเลิกใช้ / ร่วมใส่ใจพลังงานห้องเรียน', votes: 4 },
+        { team: 'Eco Office Gang', slogan: 'ปรับแอร์ยี่สิบห้าองศา / ช่วยลดค่าไฟสำนักงาน', votes: 2 },
+        { team: 'ชมรมวิศวกรกรีน', slogan: 'ถอดปลั๊กทุกครา / สับสวิตช์ตัดกระแสสูญเปล่า', votes: 5 },
+        { team: 'Green Riders', slogan: 'ทางเดียวกันคันเดียว / เลี้ยวลดมลพิษประหยัดพลังงาน', votes: 1 }
+      ];
+
+      const kw1 = state.mandatoryKeywords[0] || 'ปิด';
+      const kw2 = state.mandatoryKeywords[1] || 'พลังงาน';
+
+      mockTeams.forEach((t, i) => {
+        const ev = evaluateSloganStrict(t.slogan, state.currentSituation, kw1, kw2, 'ข้างสวิตช์ไฟ');
+        const sub = {
+          id: 'sub_mock_' + Date.now() + '_' + i,
+          round: state.round,
+          team: t.team,
+          slogan: t.slogan,
+          actionPoint: 'ข้างอุปกรณ์ในห้อง',
+          eval: ev,
+          votes: t.votes,
+          createdAt: '12:00',
+          judgeOverride: null
+        };
+        state.submissions.push(sub);
+        updateSeasonScores(t.team, ev.total);
+      });
+
+      renderLeaderboards();
+      renderGallery();
+      renderHostAuditList();
+      showToast('เพิ่ม 4 ทีมจำลองเรียบร้อย!');
+    }
+
+    function exportDataJSON() {
+      const json = JSON.stringify(state.submissions, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `eco_slogan_round_${state.round}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('ส่งออกไฟล์ JSON เรียบร้อย');
+    }
+
+    function resetAllData() {
+      if (!confirm('ต้องการล้างข้อมูลคำขวัญทั้งหมดในระบบหรือไม่?')) return;
+      state.submissions = [];
+      state.seasonScores = {};
+      userVotesMap = {};
+      resetTimer();
+      renderLeaderboards();
+      renderGallery();
+      renderHostAuditList();
+      showToast('ล้างข้อมูลเรียบร้อย');
+    }
+
+    /* ----------------------------------------------------------------
+       12. TABS & MODALS
+       ---------------------------------------------------------------- */
+    function switchTab(tabId) {
+      playSynth(600, 0.05);
+      ['play', 'leaderboard', 'gallery', 'host'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        const dBtn = document.getElementById(`tab-btn-${t}`);
+        if (dBtn) dBtn.className = 'px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 text-slate-600 hover:text-emerald-700';
+        const mBtn = document.getElementById(`m-btn-${t}`);
+        if (mBtn) mBtn.className = 'flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400 font-medium';
+      });
+
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeDBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeDBtn) activeDBtn.className = 'px-3.5 py-2 rounded-xl transition-all flex items-center gap-1.5 bg-white text-emerald-800 shadow-xs font-bold';
+      const activeMBtn = document.getElementById(`m-btn-${tabId}`);
+      if (activeMBtn) activeMBtn.className = 'flex flex-col items-center gap-0.5 py-1 px-3 text-emerald-800 font-bold';
+
+      if (tabId === 'leaderboard') renderLeaderboards();
+      if (tabId === 'gallery') renderGallery();
+      if (tabId === 'host' && state.isModUnlocked) renderHostAuditList();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openRulesModal() {
+      playSynth(600, 0.05);
+      document.getElementById('rules-modal').classList.remove('hidden');
+      document.getElementById('rules-modal').classList.add('flex');
+    }
+
+    function closeRulesModal() {
+      document.getElementById('rules-modal').classList.add('hidden');
+      document.getElementById('rules-modal').classList.remove('flex');
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast-notify');
+      document.getElementById('toast-text').textContent = text;
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 2500);
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.innerText = str;
+      return d.innerHTML;
+    }
+  </script>
+</body>
+</html>
