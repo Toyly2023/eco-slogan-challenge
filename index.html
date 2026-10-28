@@ -145,10 +145,14 @@
         <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/15 pb-4 mb-4">
           <div>
             <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/20 text-[11px] font-semibold text-emerald-100 mb-1.5">
-              <i data-lucide="dices" class="w-3.5 h-3.5"></i> การ์ดโจทย์ภารกิจประจำรอบ
+              <i data-lucide="target" class="w-3.5 h-3.5"></i> โจทย์รอบนี้ · <span id="scenario-category">-</span>
             </div>
             <h2 id="scenario-title" class="text-lg md:text-2xl font-bold tracking-tight">กำลังสุ่มโจทย์...</h2>
-            <p id="scenario-category" class="text-xs text-emerald-200/90 font-body">หมวดหมู่: -</p>
+            <ol class="mt-2.5 flex flex-wrap gap-x-4 gap-y-1.5 text-[12px] text-emerald-50 font-body">
+              <li><b class="text-amber-300">1.</b> แต่งคำขวัญ <b>2 วรรค</b> ชวนแก้ปัญหานี้</li>
+              <li><b class="text-amber-300">2.</b> ใส่<b>คีย์เวิร์ดบังคับให้ครบ 2 คำ</b></li>
+              <li><b class="text-amber-300">3.</b> ส่งภายใน <b>5 นาที</b> · คะแนนเต็ม 100</li>
+            </ol>
           </div>
           <button onclick="randomizeMission(true)" class="self-start md:self-auto px-4 py-2 bg-white/15 hover:bg-white/25 border border-white/25 rounded-xl text-xs font-bold tracking-wide transition flex items-center gap-1.5 active:scale-95">
             <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> สุ่มโจทย์ใหม่
@@ -918,7 +922,7 @@
       state.mandatoryKeywords = [kw1, kw2];
 
       document.getElementById('scenario-title').textContent = sit.title;
-      document.getElementById('scenario-category').textContent = `หมวดหมู่: ${sit.category}`;
+      document.getElementById('scenario-category').textContent = sit.category;
       document.getElementById('scenario-behavior').textContent = sit.behavior;
       document.getElementById('scenario-device-hint').textContent = `อุปกรณ์เป้าหมาย: ${sit.device}`;
       document.getElementById('action-point-input').placeholder = `เช่น ${sit.actionDefault}`;
