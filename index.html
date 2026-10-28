@@ -616,7 +616,7 @@
        ความปลอดภัยของข้อมูลควบคุมด้วย RLS ใน supabase_setup.sql
        ---------------------------------------------------------------- */
     const SUPABASE_URL = 'https://xrobowoxwedfytzqxshk.supabase.co';
-    const SUPABASE_ANON_KEY = 'xrobowoxwedfytzqxshk';
+    const SUPABASE_ANON_KEY = 'sb_publishable_LepBjQmaHsjFZvLG2R4zyQ_gQwUPkUm';
     const LEADERBOARD_TABLE = 'leaderboard';
     const LEADERBOARD_LIMIT = 50;
 
@@ -649,6 +649,7 @@
       }
       if (!window.supabase || !window.supabase.createClient) {
         setOnlineStatus('⚠️ โหลดไลบรารีไม่สำเร็จ');
+        renderOnlineMessage('โหลดไลบรารี Supabase ไม่สำเร็จ — ตรวจสอบอินเทอร์เน็ตแล้วรีเฟรชหน้า');
         return;
       }
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -682,18 +683,30 @@
 
     async function fetchOnlineLeaderboard() {
       if (!sb) return;
-      const { data, error } = await sb
+      let data, error;
+      try {
+        ({ data, error } = await sb
         .from(LEADERBOARD_TABLE)
         .select('player_name, slogan, score, score_rel, score_act, created_at')
         .order('score', { ascending: false })
         .order('score_rel', { ascending: false })
         .order('score_act', { ascending: false })
         .order('created_at', { ascending: true })
-        .limit(500);
+        .limit(500));
+      } catch (e) {
+        error = { message: String(e && e.message || e) };
+      }
 
       if (error) {
         console.error('[Leaderboard] fetch error', error);
         setOnlineStatus('⚠️ โหลดข้อมูลไม่สำเร็จ');
+        const m = (error.message || '') + ' ' + (error.code || '');
+        let hint = 'โหลดอันดับไม่สำเร็จ: ' + m.trim();
+        if (/does not exist|42P01|PGRST205|schema cache/i.test(m)) hint = 'ยังไม่พบตาราง leaderboard — กรุณารันไฟล์ supabase_setup.sql ใน SQL Editor';
+        else if (/Invalid API key|JWT|401|No API key/i.test(m)) hint = 'API key ไม่ถูกต้อง — ตรวจสอบ SUPABASE_ANON_KEY (ใช้ anon / publishable key)';
+        else if (/permission denied|42501/i.test(m)) hint = 'ไม่มีสิทธิ์อ่านตาราง — กรุณารันไฟล์ supabase_setup.sql อีกครั้ง';
+        else if (/Failed to fetch|NetworkError/i.test(m)) hint = 'เชื่อมต่อ Supabase ไม่ได้ — ตรวจสอบ SUPABASE_URL หรือโปรเจกต์อาจถูกหยุดชั่วคราว (Paused)';
+        renderOnlineMessage(hint);
         return;
       }
 
